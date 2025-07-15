@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+  id String @id @default(uuid())
+  roleId String @db.Uuid
+  firstName String @db.VarChar(30)
+  lastName String @db.VarChar(30)
+  username String @db.VarChar(50) @unique
+  email String @db.VarChar(320) @unique
+  password String @db.VarChar(255)
+  isActive Boolean @db.Boolean @default(false)
+  activationToken String? @db.VarChar(255)
+  gdpr Boolean @db.Boolean @default(true)
+  createdAt DateTime @db.Timestamp() @default(now())
+  updatedAt DateTime @db.Timestamp() @default(now())
+  role Role @relation(fields: [roleId],references: [id])
+  announcement Announcement[]
+  message Message[]
+}
+
+model Role {
+  id String @id @default(uuid())
+  name String @unique @db.VarChar(30)
+  user User[]
+}
+
+model Announcement{
+  id String @id @default(uuid())
+  userId String @db.Uuid // ca c'est fait
+  categoryId Int  @db.Integer // ca non
+  name String @db.VarChar(50)
+  latitude Float @db.DoublePrecision()
+  longitude Float @db.DoublePrecision()
+  isLost Boolean @db.Boolean
+  isArchive Boolean @db.Boolean
+  description String @db.VarChar(255)
+  picture String? @db.VarChar(255)
+  createdAt DateTime @db.Timestamp() @default(now())
+  updatedAt DateTime @db.Timestamp() @default(now())
+  dateLostOrFound DateTime @db.Timestamp()
+  messaging Messaging[]
+  user User @relation(fields: [userId],references: [id])
+  category Category @relation(fields: [categoryId],references: [id])
+}
+model Category{
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(50) @unique
+  announcement Announcement[]
+}
+
+model Message {
+  id String @id @default(uuid())
+  userId String @db.Uuid
+  messagingId String @db.Uuid
+  text String @db.VarChar(255)
+  createdAt DateTime @db.Timestamp() @default(now())
+  updatedAt DateTime @db.Timestamp() @default(now())
+  user User @relation(fields: [userId], references: [id])
+  messaging Messaging @relation(fields: [messagingId], references: [id])
+}
+
+model Messaging{
+  id String @id @default(uuid())
+  announcementId String @db.Uuid
+  createdAt DateTime @db.Timestamp() @default(now())
+  updatedAt DateTime @db.Timestamp() @default(now())
+  announcement Announcement @relation(fields: [announcementId],references: [id])
+  message Message[]
+  }
+ 
