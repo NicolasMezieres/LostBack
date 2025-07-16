@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String         @id @default(uuid())
+  roleId          String
+  firstName       String         @db.VarChar(30)
+  lastName        String         @db.VarChar(30)
+  username        String         @unique @db.VarChar(50)
+  email           String         @unique @db.VarChar(320)
+  password        String         @db.VarChar(255)
+  isActive        Boolean        @default(false) @db.Boolean
+  activationToken String?        @db.VarChar(255)
+  gdpr            Boolean        @default(true) @db.Boolean
+  createdAt       DateTime       @default(now()) @db.Timestamp()
+  updatedAt       DateTime       @default(now()) @db.Timestamp()
+  role            Role           @relation(fields: [roleId], references: [id])
+  announcement    Announcement[]
+  message         Message[]
+}
+
+model Role {
+  id   String @id @default(uuid())
+  name String @unique @db.VarChar(30)
+  user User[]
+}
+
+model Announcement {
+  id              String      @id @default(uuid())
+  userId          String
+  categoryId      Int
+  name            String      @db.VarChar(50)
+  latitude        Float       @db.DoublePrecision()
+  longitude       Float       @db.DoublePrecision()
+  isLost          Boolean     @db.Boolean
+  isArchive       Boolean     @db.Boolean
+  description     String      @db.VarChar(255)
+  picture         String?     @db.VarChar(255)
+  createdAt       DateTime    @default(now()) @db.Timestamp()
+  updatedAt       DateTime    @default(now()) @db.Timestamp()
+  dateLostOrFound DateTime    @db.Timestamp()
+  messaging       Messaging[]
+  user            User        @relation(fields: [userId], references: [id])
+  category        Category    @relation(fields: [categoryId], references: [id])
+}
+
+model Category {
+  id           Int            @id @default(autoincrement())
+  name         String         @unique @db.VarChar(50)
+  announcement Announcement[]
+}
+
+model Message {
+  id          String    @id @default(uuid())
+  userId      String
+  messagingId String
+  text        String    @db.VarChar(255)
+  createdAt   DateTime  @default(now()) @db.Timestamp()
+  updatedAt   DateTime  @default(now()) @db.Timestamp()
+  user        User      @relation(fields: [userId], references: [id])
+  messaging   Messaging @relation(fields: [messagingId], references: [id])
+}
+
+model Messaging {
+  id             String       @id @default(uuid())
+  announcementId String
+  createdAt      DateTime     @default(now()) @db.Timestamp()
+  updatedAt      DateTime     @default(now()) @db.Timestamp()
+  announcement   Announcement @relation(fields: [announcementId], references: [id])
+  message        Message[]
+}
