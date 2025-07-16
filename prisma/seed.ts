@@ -1,7 +1,7 @@
-import { Role } from 'src/utils/enum';
-import { PrismaClient } from '../src/generated/client';
-import * as argon from 'argon2';
 import { ConfigService } from '@nestjs/config';
+import { PrismaClient } from '@prisma/client';
+import * as argon from 'argon2';
+import { Role } from 'src/utils/enum';
 const config = new ConfigService();
 const prisma = new PrismaClient();
 async function main() {
