@@ -1,6 +1,6 @@
+
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -10,7 +10,7 @@ datasource db {
 
 model User{
   id String @id @default(uuid())
-  roleId String @db.Uuid
+  roleId String 
   firstName String @db.VarChar(30)
   lastName String @db.VarChar(30)
   username String @db.VarChar(50) @unique
@@ -34,8 +34,8 @@ model Role {
 
 model Announcement{
   id String @id @default(uuid())
-  userId String @db.Uuid // ca c'est fait
-  categoryId Int  @db.Integer // ca non
+  userId String 
+  categoryId Int 
   name String @db.VarChar(50)
   latitude Float @db.DoublePrecision()
   longitude Float @db.DoublePrecision()
@@ -57,9 +57,9 @@ model Category{
 }
 
 model Message {
-  id String @id @default(uuid())
-  userId String @db.Uuid
-  messagingId String @db.Uuid
+  id String  @id @default(uuid())
+  userId String 
+  messagingId String 
   text String @db.VarChar(255)
   createdAt DateTime @db.Timestamp() @default(now())
   updatedAt DateTime @db.Timestamp() @default(now())
@@ -69,7 +69,7 @@ model Message {
 
 model Messaging{
   id String @id @default(uuid())
-  announcementId String @db.Uuid
+  announcementId String 
   createdAt DateTime @db.Timestamp() @default(now())
   updatedAt DateTime @db.Timestamp() @default(now())
   announcement Announcement @relation(fields: [announcementId],references: [id])
