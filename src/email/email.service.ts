@@ -19,8 +19,9 @@ export class EmailService {
   }
 
   async accountConfirmation(user: User, token: string) {
-    const url = `${process.env.FRONT_URL}${token}`;
-    const emailHTML = `<p>Confirmation your email.</p>
+    const url = `${process.env.FRONT_URL}?token=${token}`;
+    const emailHTML = `<h1>Confirmation your email.</h1>
+    <p>${user.username}</p>
     <p>Use this link <a href=${url}>here</a> for activate your account</p>`;
     await this.transporter.sendMail({
       from: this.config.get('SMTP_EMAIL'),

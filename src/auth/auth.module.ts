@@ -16,6 +16,7 @@ import { JwtSrategy } from './strategy/jwt.strategy';
     JwtService,
     JwtSrategy,
     EmailService,
+    
   ],
 })
 export class AuthModule {}

@@ -9,6 +9,7 @@ import { EmailModule } from './email/email.module';
   imports: [
     PrismaModule,
     ConfigModule.forRoot({ isGlobal: true }),
+
     JwtModule,
     AuthModule,
     EmailModule,
