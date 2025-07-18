@@ -35,4 +35,11 @@ export class UserService {
     });
     return { message: 'Profile update successfully' };
   }
+  async disableAccount(user: User) {
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { isActive: false },
+    });
+    return { message: 'Your account is disable now!' };
+  }
 }
