@@ -4,7 +4,12 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { signinDTO, signupDTO } from './dto';
+import {
+  forgetPasswordDTO,
+  ResetPasswordDTO,
+  signinDTO,
+  signupDTO,
+} from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
 import { Role } from 'src/utils/enum';
@@ -70,11 +75,12 @@ export class AuthService {
     });
     return { message: 'Your account is active !' };
   }
-  async signToken(user: User) {
+  async signToken(user: User, delay: string) {
     const payload = { sub: user.id };
     return {
       connexion_token: await this.jwtService.signAsync(payload, {
         secret: this.config.get('JWT_SECRET'),
+        expiresIn: delay,
       }),
     };
   }
@@ -97,7 +103,7 @@ export class AuthService {
     if (!isSamePassword) {
       throw new UnauthorizedException('Invalid credential');
     }
-    const token = await this.signToken(existingUser);
+    const token = await this.signToken(existingUser, '1d');
     res.cookie('access_token', token.connexion_token, {
       // permet au cookie d'être accessible uniquement au serveur web
       httpOnly: true,
@@ -111,5 +117,27 @@ export class AuthService {
       message: 'Connexion succesfully',
       role: existingUser.role.name,
     };
+  }
+
+  async forgetPassword(dto: forgetPasswordDTO) {
+    const existingEmail = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+    if (existingEmail && existingEmail.isActive) {
+      const token = await this.signToken(existingEmail, '10m');
+      this.email.forgetPassword(existingEmail, token.connexion_token);
+    } else if (existingEmail && !existingEmail.isActive) {
+      return { message: 'Your account is not active' };
+    }
+    return { message: 'Check your email' };
+  }
+
+  async resetPassword(user: User, dto: ResetPasswordDTO) {
+    const hash = await argon.hash(dto.password);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { password: hash },
+    });
+    return { message: 'Password change, congratulations !' };
   }
 }

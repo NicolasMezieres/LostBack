@@ -1,0 +1,38 @@
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { User } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { profileDTO } from './dto';
+
+@Injectable()
+export class UserService {
+  constructor(private prisma: PrismaService) {}
+
+  async getMyProfile(user: User) {
+    return {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      username: user.username,
+    };
+  }
+
+  async patchMyProfile(user: User, dto: profileDTO) {
+    const existingEmail = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+    const existingUsername = await this.prisma.user.findUnique({
+      where: { username: dto.username },
+    });
+    if (existingEmail) {
+      throw new ForbiddenException('Email already taken');
+    } else if (existingUsername) {
+      throw new ForbiddenException('Username already taken');
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { ...dto },
+    });
+    return { message: 'Profile update successfully' };
+  }
+}

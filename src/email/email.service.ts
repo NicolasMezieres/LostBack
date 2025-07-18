@@ -30,4 +30,17 @@ export class EmailService {
       html: emailHTML,
     });
   }
+  async forgetPassword(user: User, token: string) {
+    const url = `${process.env.FRONT_URL}forgetPassword/?token=${token}`;
+    const emailHTML = `<h1>Hello ${user.username}</h1>
+    <p>You received this email it's because you are a red fish and you forget your password</p>
+    <p>If this mail is not your decision please ignore that</p>
+    <p>For reset your password click <a href=${url}>here</a> </p>`;
+    await this.transporter.sendMail({
+      from: this.config.get('SMTP_EMAIL'),
+      to: user.email,
+      subject: 'Reset your password',
+      html: emailHTML,
+    });
+  }
 }
