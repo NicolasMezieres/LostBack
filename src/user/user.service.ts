@@ -42,4 +42,18 @@ export class UserService {
     });
     return { message: 'Your account is disable now!' };
   }
+  async getAllUser(user: User, page: string) {
+    const take = 10;
+    const skip =
+      Number(page) - 1 <= 0 || isNaN(Number(page))
+        ? 0
+        : (Number(page) - 1) * take;
+    return {
+      data: await this.prisma.user.findMany({
+        omit: { roleId: true, activationToken: true },
+        take: 10,
+        skip: skip,
+      }),
+    };
+  }
 }

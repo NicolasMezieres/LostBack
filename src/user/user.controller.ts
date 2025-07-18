@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { JwtGuard } from 'src/auth/guards';
+import { AdminGuard, JwtGuard } from 'src/auth/guards';
 import { GetUser } from 'src/auth/decorator';
 import { User } from '@prisma/client';
 import { profileDTO } from './dto';
@@ -22,5 +22,11 @@ export class UserController {
   @Patch('disableMyAccount')
   disableMyAccount(@GetUser() user: User) {
     return this.userService.disableAccount(user);
+  }
+
+  @UseGuards(AdminGuard)
+  @Get('/:page')
+  getAllUser(@GetUser() user: User, @Param('page') page: string) {
+    return this.userService.getAllUser(user, page);
   }
 }
