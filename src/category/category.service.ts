@@ -24,7 +24,7 @@ export class CategoryService {
         name: dto.name,
       },
     });
-    return { message: 'Bien ouej' };
+    return { message: 'Category create !' };
   }
 
   async getCategories(query: queryCategory) {
@@ -34,7 +34,6 @@ export class CategoryService {
           contains: query.search,
         },
       },
-      omit: { id: true },
       take: 5,
     });
     if (!categoriesFound) {
