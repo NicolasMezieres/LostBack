@@ -47,10 +47,30 @@ export class AnnoncementService {
     if (!existingAnnoncement) {
       throw new UnauthorizedException('Announcement not found');
     }
+    const userArchive = await this.prisma.user.findUnique({
+      where: { id: existingAnnoncement.userId },
+    });
+    if (!userArchive) {
+      throw new UnauthorizedException('User not found');
+    }
     const updatedAnnoncement = await this.prisma.announcement.update({
       where: { id },
       data: { isArchive: true },
     });
     return { message: 'Announcement has been archived', updatedAnnoncement };
+  }
+
+  async getCategoryInAnnoncement(dto: categoryDTO) {
+    const existingCategory = await this.prisma.category.findUnique({
+      where: { name: dto.name },
+    });
+    if (!existingCategory) {
+      throw new UnauthorizedException('Category not found');
+    }
+    const announcements = await this.prisma.announcement.findMany({
+      where: { categoryId: existingCategory.id },
+    });
+
+    return announcements;
   }
 }
