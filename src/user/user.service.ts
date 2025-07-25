@@ -56,4 +56,20 @@ export class UserService {
       }),
     };
   }
+  async getStatistic() {
+    const numberAccount = await this.prisma.user.count();
+    const numberActiveAccount = await this.prisma.user.count({
+      where: { isActive: true },
+    });
+    const numberAnnouncement = await this.prisma.announcement.count();
+    const numberArchiveAnnouncement = await this.prisma.announcement.count({
+      where: { isArchive: true },
+    });
+    return {
+      numberAccount,
+      numberActiveAccount,
+      numberAnnouncement,
+      numberArchiveAnnouncement,
+    };
+  }
 }

@@ -23,7 +23,11 @@ export class UserController {
   disableMyAccount(@GetUser() user: User) {
     return this.userService.disableAccount(user);
   }
-
+  @UseGuards(AdminGuard)
+  @Get('/statistic')
+  getStatistic() {
+    return this.userService.getStatistic();
+  }
   @UseGuards(AdminGuard)
   @Get('/:page')
   getAllUser(@GetUser() user: User, @Param('page') page: string) {
