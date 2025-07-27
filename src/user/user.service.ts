@@ -2,6 +2,8 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { profileDTO } from './dto';
+import { Role } from 'src/utils/enum';
+import { queryUser } from 'src/utils/type';
 
 @Injectable()
 export class UserService {
@@ -42,18 +44,46 @@ export class UserService {
     });
     return { message: 'Your account is disable now!' };
   }
-  async getAllUser(user: User, page: string) {
+  async getAllUser(query: queryUser) {
     const take = 10;
     const skip =
-      Number(page) - 1 <= 0 || isNaN(Number(page))
+      Number(query.page) - 1 <= 0 || isNaN(Number(query.page))
         ? 0
-        : (Number(page) - 1) * take;
+        : (Number(query.page) - 1) * take;
+    const countUser = await this.prisma.user.count({
+      where: {
+        role: { name: Role.USER },
+        OR: [
+          { username: { contains: query.search } },
+          { email: { contains: query.search } },
+        ],
+      },
+    });
+    function isEndList(): boolean {
+      if (skip + take > countUser) {
+        return true;
+      }
+      return false;
+    }
     return {
       data: await this.prisma.user.findMany({
-        omit: { roleId: true, activationToken: true },
+        where: {
+          role: { name: Role.USER },
+          OR: [
+            { username: { contains: query.search } },
+            { email: { contains: query.search } },
+          ],
+        },
+        omit: {
+          roleId: true,
+          activationToken: true,
+          password: true,
+        },
         take: 10,
         skip: skip,
       }),
+      totalUser: countUser,
+      isEndList: isEndList(),
     };
   }
   async getStatistic() {

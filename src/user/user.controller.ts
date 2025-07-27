@@ -1,9 +1,18 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { AdminGuard, JwtGuard } from 'src/auth/guards';
 import { GetUser } from 'src/auth/decorator';
 import { User } from '@prisma/client';
 import { profileDTO } from './dto';
+import { queryUser } from 'src/utils/type';
 @UseGuards(JwtGuard)
 @Controller('user')
 export class UserController {
@@ -29,8 +38,8 @@ export class UserController {
     return this.userService.getStatistic();
   }
   @UseGuards(AdminGuard)
-  @Get('/:page')
-  getAllUser(@GetUser() user: User, @Param('page') page: string) {
-    return this.userService.getAllUser(user, page);
+  @Get('/')
+  getAllUser(@Query() query: queryUser) {
+    return this.userService.getAllUser(query);
   }
 }
