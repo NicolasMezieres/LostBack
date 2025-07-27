@@ -42,4 +42,14 @@ export class UserController {
   getAllUser(@Query() query: queryUser) {
     return this.userService.getAllUser(query);
   }
+  @UseGuards(AdminGuard)
+  @Patch("/banishment/:id")
+  banUser(@Param("id") id :string){
+    return this.userService.banUser(id);
+  }
+  @UseGuards(AdminGuard)
+  @Patch("/remove/:id")
+  removeUser(@Param("id") id :string){
+    return this.userService.removeUser(id);
+  }
 }

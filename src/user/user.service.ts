@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { profileDTO } from './dto';
@@ -101,5 +105,31 @@ export class UserService {
       numberAnnouncement,
       numberArchiveAnnouncement,
     };
+  }
+
+  async banUser(id: string) {
+    const existingUser = await this.prisma.user.findFirst({
+      where: { id: id, role: { name: Role.USER }, isActive: true },
+    });
+    if (!existingUser) {
+      throw new NotFoundException('User not found');
+    }
+    await this.prisma.user.update({
+      where: { id: id },
+      data: { isActive: false },
+    });
+    return { message: existingUser.username + ' is ban' };
+  }
+  async removeUser(id: string) {
+    const existingUser = await this.prisma.user.findFirst({
+      where: { id: id, role: { name: Role.USER } },
+    });
+    if (!existingUser) {
+      throw new NotFoundException('User not found');
+    }
+    await this.prisma.user.delete({
+      where: { id: id },
+    });
+    return { message: existingUser.username + ' is remove' };
   }
 }
