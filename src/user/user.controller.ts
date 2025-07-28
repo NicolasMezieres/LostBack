@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -43,13 +44,13 @@ export class UserController {
     return this.userService.getAllUser(query);
   }
   @UseGuards(AdminGuard)
-  @Patch("/banishment/:id")
-  banUser(@Param("id") id :string){
+  @Patch('/banishment/:id')
+  banUser(@Param('id') id: string) {
     return this.userService.banUser(id);
   }
   @UseGuards(AdminGuard)
-  @Patch("/remove/:id")
-  removeUser(@Param("id") id :string){
+  @Delete('/remove/:id')
+  removeUser(@Param('id') id: string) {
     return this.userService.removeUser(id);
   }
 }
