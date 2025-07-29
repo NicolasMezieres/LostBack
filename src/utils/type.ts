@@ -8,3 +8,9 @@ export type queryUser = {
   page: string;
   search: string;
 };
+export type queryAnnouncementAdmin = {
+  search: string | undefined;
+  isLost: string | undefined;
+  fromDate: string | undefined;
+  toDate: string | undefined;
+};

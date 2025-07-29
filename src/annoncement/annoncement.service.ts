@@ -4,6 +4,7 @@ import { annoncementDTO } from './dto';
 import { User } from '@prisma/client';
 import { categoryDTO } from 'src/category/dto';
 import { contains } from 'class-validator';
+import { queryAnnouncementAdmin } from 'src/utils/type';
 
 @Injectable()
 export class AnnoncementService {
@@ -72,5 +73,39 @@ export class AnnoncementService {
     });
 
     return announcements;
+  }
+  async announcementByAdmin(query: queryAnnouncementAdmin) {
+    const existingCategory = await this.prisma.category.findUnique({
+      where: { name: query.search ? query.search : '' },
+    });
+
+    return {
+      data: await this.prisma.announcement.findMany({
+        include: { category: true },
+        where: {
+          OR: [
+            { categoryId: existingCategory?.id },
+            { name: { contains: query.search } },
+          ],
+
+          isLost:
+            query.isLost === 'true'
+              ? true
+              : query.isLost === 'false'
+                ? false
+                : undefined,
+          dateLostOrFound: {
+            lte: query.toDate
+              ? new Date(
+                  new Date(query.toDate).setDate(
+                    new Date(query.toDate).getDate() + 1,
+                  ),
+                )
+              : undefined,
+            gte: query.fromDate ? new Date(query.fromDate) : undefined,
+          },
+        },
+      }),
+    };
   }
 }

@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AnnoncementService } from './annoncement.service';
@@ -15,6 +16,7 @@ import { GetUser } from 'src/auth/decorator';
 import { User } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guards';
 import { AdminGuard } from 'src/auth/guards/admin.guard';
+import { queryAnnouncementAdmin } from 'src/utils/type';
 
 @Controller('annoncement')
 export class AnnoncementController {
@@ -37,9 +39,13 @@ export class AnnoncementController {
     return this.annoncementService.archiveAnnoncement(id);
   }
 
- 
   @Get('getCategoryInAnnoncement')
   getCategoryInAnnoncement(@Body() dto: categoryDTO) {
     return this.annoncementService.getCategoryInAnnoncement(dto);
+  }
+  @UseGuards(AdminGuard)
+  @Get('announcementByAdmin')
+  announcementByAdmin(@Query() query: queryAnnouncementAdmin) {
+    return this.annoncementService.announcementByAdmin(query);
   }
 }
