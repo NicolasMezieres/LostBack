@@ -3,19 +3,19 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { annoncementDTO } from './dto';
 import { User } from '@prisma/client';
 import { categoryDTO } from 'src/category/dto';
-import { contains } from 'class-validator';
+
 
 @Injectable()
 export class AnnoncementService {
   constructor(private prisma: PrismaService) {}
 
   async annoncement(dto: annoncementDTO, user: User) {
-    const existingannoncement = await this.prisma.announcement.findFirst({
-      where: { userId: user.id, categoryId: dto.categoryId },
-    });
-    if (existingannoncement) {
-      throw new UnauthorizedException('This annocement already exists ');
-    }
+    // const existingannoncement = await this.prisma.announcement.findFirst({
+    //   where: { userId: user.id, categoryId: dto.categoryId },
+    // });
+    // if (existingannoncement) {
+    //   throw new UnauthorizedException('This annoncement already exists ');
+    // }
 
     const createAnnoncement = await this.prisma.announcement.create({
       data: {

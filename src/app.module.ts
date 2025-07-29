@@ -7,20 +7,22 @@ import { EmailModule } from './email/email.module';
 import { UserModule } from './user/user.module';
 import { AnnoncementModule } from './annoncement/annoncement.module';
 import { CategoryModule } from './category/category.module';
-import { MessagesModule } from './messages/messages.module';
+// import { AppGateway } from './app.gateway';
+import { MessagingModule } from './messaging/messaging.module';
 
 @Module({
   imports: [
     PrismaModule,
     ConfigModule.forRoot({ isGlobal: true }),
-
     JwtModule,
     AuthModule,
     EmailModule,
     UserModule,
     AnnoncementModule,
     CategoryModule,
-    MessagesModule,
+    MessagingModule,
+  
   ],
+  providers: [],
 })
 export class AppModule {}

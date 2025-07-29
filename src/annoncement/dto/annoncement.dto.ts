@@ -1,12 +1,10 @@
 import {
   IsBoolean,
-  IsDate,
   IsDateString,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
-  IsUUID,
   Max,
   MaxLength,
   Min,
@@ -56,5 +54,8 @@ export class annoncementDTO {
   @IsDateString()
   @IsNotEmpty()
   dateLostOrFound: Date;
-  id: any;
+  
+  @IsString()
+  @IsNotEmpty()
+  id: string
 }

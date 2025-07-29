@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   binaryTargets = ["native", "windows", "darwin-arm64"]
@@ -42,7 +41,7 @@ model Announcement{
   latitude Float @db.DoublePrecision()
   longitude Float @db.DoublePrecision()
   isLost Boolean @db.Boolean
-  isArchive Boolean @db.Boolean @default(false)
+  isArchive Boolean @db.Boolean
   description String @db.VarChar(255)
   picture String? @db.VarChar(255)
   createdAt DateTime @db.Timestamp() @default(now())
