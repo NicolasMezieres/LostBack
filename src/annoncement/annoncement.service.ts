@@ -5,6 +5,7 @@ import { User } from '@prisma/client';
 import { categoryDTO } from 'src/category/dto';
 import { contains } from 'class-validator';
 import { queryAnnouncementAdmin } from 'src/utils/type';
+import { isEndList } from 'src/utils/const';
 
 @Injectable()
 export class AnnoncementService {
@@ -78,11 +79,49 @@ export class AnnoncementService {
     const existingCategory = await this.prisma.category.findUnique({
       where: { name: query.search ? query.search : '' },
     });
+    const existingUser = await this.prisma.user.findUnique({
+      where: { username: query?.search },
+    });
+    const take = 10;
+    const skip =
+      Number(query.page) - 1 <= 0 || isNaN(Number(query.page))
+        ? 0
+        : (Number(query.page) - 1) * take;
+    const countAnnouncement = await this.prisma.announcement.count({
+      where: {
+        OR: [
+          { userId: existingUser?.id },
+          { categoryId: existingCategory?.id },
+          { name: { contains: query.search } },
+        ],
+        isLost:
+          query.isLost === 'true'
+            ? true
+            : query.isLost === 'false'
+              ? false
+              : undefined,
+        dateLostOrFound: {
+          lte:
+            new Date(query.toDate).toString() != 'Invalid Date'
+              ? new Date(
+                  new Date(query.toDate).setDate(
+                    new Date(query.toDate).getDate() + 1,
+                  ),
+                )
+              : undefined,
+          gte:
+            new Date(query.fromDate).toString() != 'Invalid Date'
+              ? new Date(query.fromDate)
+              : undefined,
+        },
+      },
+    });
+
     return {
       data: await this.prisma.announcement.findMany({
-        // include: { category: true, user: true },
         where: {
           OR: [
+            { userId: existingUser?.id },
             { categoryId: existingCategory?.id },
             { name: { contains: query.search } },
           ],
@@ -109,15 +148,16 @@ export class AnnoncementService {
         },
         select: {
           id: true,
-          category: true,
           name: true,
           picture: true,
-          description: true,
           dateLostOrFound: true,
-          isArchive: true,
           user: { select: { username: true } },
         },
+        take: take,
+        skip: skip,
       }),
+      total: countAnnouncement,
+      isEndList: isEndList(skip, take, countAnnouncement),
     };
   }
 }

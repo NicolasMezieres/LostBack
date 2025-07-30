@@ -8,6 +8,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { profileDTO } from './dto';
 import { Role } from 'src/utils/enum';
 import { queryUser } from 'src/utils/type';
+import { isEndList } from 'src/utils/const';
 
 @Injectable()
 export class UserService {
@@ -63,12 +64,7 @@ export class UserService {
         ],
       },
     });
-    function isEndList(): boolean {
-      if (skip + take > countUser) {
-        return true;
-      }
-      return false;
-    }
+
     return {
       data: await this.prisma.user.findMany({
         where: {
@@ -87,7 +83,7 @@ export class UserService {
         skip: skip,
       }),
       totalUser: countUser,
-      isEndList: isEndList(),
+      isEndList: isEndList(skip, take, countUser),
     };
   }
   async getStatistic() {

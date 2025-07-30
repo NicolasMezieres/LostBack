@@ -13,4 +13,5 @@ export type queryAnnouncementAdmin = {
   isLost: string | undefined;
   fromDate: string;
   toDate: string;
+  page: string;
 };
