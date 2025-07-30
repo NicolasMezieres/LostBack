@@ -7,7 +7,7 @@ import { EmailModule } from './email/email.module';
 import { UserModule } from './user/user.module';
 import { AnnoncementModule } from './annoncement/annoncement.module';
 import { CategoryModule } from './category/category.module';
-// import { AppGateway } from './app.gateway';
+import { AppGateway } from './app.gateway';
 import { MessagingModule } from './messaging/messaging.module';
 
 @Module({
@@ -23,6 +23,6 @@ import { MessagingModule } from './messaging/messaging.module';
     MessagingModule,
   
   ],
-  providers: [],
+  providers: [ AppGateway ],
 })
 export class AppModule {}
