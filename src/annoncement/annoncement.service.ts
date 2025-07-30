@@ -78,7 +78,6 @@ export class AnnoncementService {
     const existingCategory = await this.prisma.category.findUnique({
       where: { name: query.search ? query.search : '' },
     });
-
     return {
       data: await this.prisma.announcement.findMany({
         include: { category: true },
@@ -87,7 +86,6 @@ export class AnnoncementService {
             { categoryId: existingCategory?.id },
             { name: { contains: query.search } },
           ],
-
           isLost:
             query.isLost === 'true'
               ? true
@@ -95,14 +93,18 @@ export class AnnoncementService {
                 ? false
                 : undefined,
           dateLostOrFound: {
-            lte: query.toDate
-              ? new Date(
-                  new Date(query.toDate).setDate(
-                    new Date(query.toDate).getDate() + 1,
-                  ),
-                )
-              : undefined,
-            gte: query.fromDate ? new Date(query.fromDate) : undefined,
+            lte:
+              new Date(query.toDate).toString() != 'Invalid Date'
+                ? new Date(
+                    new Date(query.toDate).setDate(
+                      new Date(query.toDate).getDate() + 1,
+                    ),
+                  )
+                : undefined,
+            gte:
+              new Date(query.fromDate).toString() != 'Invalid Date'
+                ? new Date(query.fromDate)
+                : undefined,
           },
         },
       }),

@@ -11,6 +11,6 @@ export type queryUser = {
 export type queryAnnouncementAdmin = {
   search: string | undefined;
   isLost: string | undefined;
-  fromDate: string | undefined;
-  toDate: string | undefined;
+  fromDate: string;
+  toDate: string;
 };
