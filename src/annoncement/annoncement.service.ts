@@ -80,7 +80,7 @@ export class AnnoncementService {
     });
     return {
       data: await this.prisma.announcement.findMany({
-        include: { category: true },
+        // include: { category: true, user: true },
         where: {
           OR: [
             { categoryId: existingCategory?.id },
@@ -106,6 +106,16 @@ export class AnnoncementService {
                 ? new Date(query.fromDate)
                 : undefined,
           },
+        },
+        select: {
+          id: true,
+          category: true,
+          name: true,
+          picture: true,
+          description: true,
+          dateLostOrFound: true,
+          isArchive: true,
+          user: { select: { username: true } },
         },
       }),
     };
