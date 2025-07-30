@@ -32,4 +32,23 @@ export class MessagingService {
     });
     return { message: 'Messaging created successfully' };
   }
+
+  async getMessagingByAnnouncementId(announcementId: string) {
+    const messaging = await this.prisma.messaging.findMany({
+      where: { announcementId },
+    });
+    if (!messaging.length) {
+      throw new UnauthorizedException('No messages found for this announcement');
+    }
+    return messaging;
+  }
+  async getMessagingById(id: string) {
+    const messaging = await this.prisma.messaging.findUnique({
+      where: { id },
+    });
+    if (!messaging) {
+      throw new UnauthorizedException('Messaging not found');
+    }
+    return messaging;
+  }
 }

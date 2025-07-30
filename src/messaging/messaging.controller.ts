@@ -19,4 +19,14 @@ export class MessagingController {
   createMessaging(@Body() dto: messagingDTO, annoncementDTO: Announcement) {
     return this.messagingService.messaging(dto, annoncementDTO);
   }
+
+  @Get('getMessagingByAnnouncementId')
+  getMessagingByAnnouncementId(@Body('announcementId') announcementId: string) {
+    return this.messagingService.getMessagingByAnnouncementId(announcementId);
+  }
+
+  @Get('getMessagingById')
+  getMessagingById(@Body('id') id: string) {
+    return this.messagingService.getMessagingById(id);
+  }
 }
