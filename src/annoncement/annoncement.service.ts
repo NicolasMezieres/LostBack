@@ -10,13 +10,12 @@ export class AnnoncementService {
   constructor(private prisma: PrismaService) {}
 
   async annoncement(dto: annoncementDTO, user: User) {
-    // const existingannoncement = await this.prisma.announcement.findFirst({
-    //   where: { userId: user.id, categoryId: dto.categoryId },
-    // });
-    // if (existingannoncement) {
-    //   throw new UnauthorizedException('This annoncement already exists ');
-    // }
-
+   const existingAnnoncement = await this.prisma.announcement.findUnique({
+      where: { id: dto.id },
+    });
+    if (existingAnnoncement) {
+      throw new UnauthorizedException('Announcement already exists');
+    }
     const createAnnoncement = await this.prisma.announcement.create({
       data: {
         ...dto,

@@ -5,5 +5,9 @@ export class messagingDTO {
   @IsNotEmpty()
   annoncementId: string;
 
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
   
 }
