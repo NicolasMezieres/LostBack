@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export class messagingDTO {
   @IsString()
   @IsNotEmpty()
-  annoncementId: string;
+  announcementId: string;
 
   @IsString()
   @IsNotEmpty()

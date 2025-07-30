@@ -17,17 +17,17 @@ export class MessagingService {
     }
     return { message: 'Annoncement found' };
   }
+
   async messaging(dto: messagingDTO, annoncementDTO: Announcement) {
     const existingMessaging = await this.prisma.messaging.findUnique({
-      where: { id: dto.id, announcementId: annoncementDTO.id },
+      where: { id: dto.id, announcementId: dto.announcementId },
     });
-    if (!existingMessaging) {
+    if (existingMessaging) {
       throw new UnauthorizedException('Messaging not found');
     }
     const createMessaging = await this.prisma.messaging.create({
       data: {
         ...dto,
-        announcementId: annoncementDTO.id,
       },
     });
     return { message: 'Messaging created successfully' };

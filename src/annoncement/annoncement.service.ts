@@ -4,13 +4,12 @@ import { annoncementDTO } from './dto';
 import { User } from '@prisma/client';
 import { categoryDTO } from 'src/category/dto';
 
-
 @Injectable()
 export class AnnoncementService {
   constructor(private prisma: PrismaService) {}
 
   async annoncement(dto: annoncementDTO, user: User) {
-   const existingAnnoncement = await this.prisma.announcement.findUnique({
+    const existingAnnoncement = await this.prisma.announcement.findUnique({
       where: { id: dto.id },
     });
     if (existingAnnoncement) {
