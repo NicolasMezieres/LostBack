@@ -107,10 +107,11 @@ export class AuthService {
     res.cookie('access_token', token.connexion_token, {
       // permet au cookie d'être accessible uniquement au serveur web
       httpOnly: true,
-      sameSite: 'strict',
+      //strict si c'est le front et le back on le même url sinon none
+      sameSite: 'none',
       //durée du cookie
       maxAge: 1000 * 60 * 60 * 24 * 7,
-      //est ce que le cookie doit provenir d'un https
+      //est ce que le cookie doit provenir d'un https et est ce que c'est le même nom de domaine entre back et front
       secure: process.env.IS_PRODUCTION === 'true' ? true : false,
     });
     return {

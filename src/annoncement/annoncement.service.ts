@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { annoncementDTO } from './dto';
 import { User } from '@prisma/client';
@@ -87,65 +91,41 @@ export class AnnoncementService {
       Number(query.page) - 1 <= 0 || isNaN(Number(query.page))
         ? 0
         : (Number(query.page) - 1) * take;
-    const countAnnouncement = await this.prisma.announcement.count({
-      where: {
-        OR: [
-          { userId: existingUser?.id },
-          { categoryId: existingCategory?.id },
-          { name: { contains: query.search } },
-        ],
-        isLost:
-          query.isLost === 'true'
-            ? true
-            : query.isLost === 'false'
-              ? false
-              : undefined,
-        dateLostOrFound: {
-          lte:
-            new Date(query.toDate).toString() != 'Invalid Date'
-              ? new Date(
-                  new Date(query.toDate).setDate(
-                    new Date(query.toDate).getDate() + 1,
-                  ),
-                )
-              : undefined,
-          gte:
-            new Date(query.fromDate).toString() != 'Invalid Date'
-              ? new Date(query.fromDate)
-              : undefined,
-        },
+    const whereData = {
+      OR: [
+        { userId: existingUser?.id },
+        { categoryId: existingCategory?.id },
+        { name: { contains: query.search } },
+      ],
+      isLost:
+        query.isLost === 'true'
+          ? true
+          : query.isLost === 'false'
+            ? false
+            : undefined,
+      dateLostOrFound: {
+        lte:
+          new Date(query.toDate).toString() != 'Invalid Date'
+            ? new Date(
+                new Date(query.toDate).setDate(
+                  new Date(query.toDate).getDate() + 1,
+                ),
+              )
+            : undefined,
+        gte:
+          new Date(query.fromDate).toString() != 'Invalid Date'
+            ? new Date(query.fromDate)
+            : undefined,
       },
+    };
+
+    const countAnnouncement = await this.prisma.announcement.count({
+      where: whereData,
     });
 
     return {
       data: await this.prisma.announcement.findMany({
-        where: {
-          OR: [
-            { userId: existingUser?.id },
-            { categoryId: existingCategory?.id },
-            { name: { contains: query.search } },
-          ],
-          isLost:
-            query.isLost === 'true'
-              ? true
-              : query.isLost === 'false'
-                ? false
-                : undefined,
-          dateLostOrFound: {
-            lte:
-              new Date(query.toDate).toString() != 'Invalid Date'
-                ? new Date(
-                    new Date(query.toDate).setDate(
-                      new Date(query.toDate).getDate() + 1,
-                    ),
-                  )
-                : undefined,
-            gte:
-              new Date(query.fromDate).toString() != 'Invalid Date'
-                ? new Date(query.fromDate)
-                : undefined,
-          },
-        },
+        where: whereData,
         select: {
           id: true,
           name: true,
@@ -159,5 +139,25 @@ export class AnnoncementService {
       total: countAnnouncement,
       isEndList: isEndList(skip, take, countAnnouncement),
     };
+  }
+  async announcementById(id: string) {
+    const existingAnnouncement = await this.prisma.announcement.findUnique({
+      where: { id },
+      select: {
+        name: true,
+        picture: true,
+        category: { select: { name: true } },
+        description: true,
+        latitude: true,
+        longitude: true,
+        dateLostOrFound: true,
+        user: { select: { username: true } },
+        isArchive: true,
+      },
+    });
+    if (!existingAnnouncement) {
+      throw new NotFoundException('Announcement not found');
+    }
+    return { data: existingAnnouncement };
   }
 }

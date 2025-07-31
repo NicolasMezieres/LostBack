@@ -48,4 +48,8 @@ export class AnnoncementController {
   announcementByAdmin(@Query() query: queryAnnouncementAdmin) {
     return this.annoncementService.announcementByAdmin(query);
   }
+  @Get('/:id')
+  announcementById(@Param('id') id: string) {
+    return this.annoncementService.announcementById(id);
+  }
 }
