@@ -10,19 +10,19 @@ import {
 export class signupDTO {
   @IsNotEmpty()
   @IsString()
-  @MaxLength(30, { message: 'PROUT.' })
+  @MaxLength(30)
   @MinLength(3)
   firstName: string;
 
   @IsNotEmpty()
   @IsString()
-  @MaxLength(30, { message: 'TRUOP' })
+  @MaxLength(30)
   @MinLength(1)
   lastName: string;
 
   @IsNotEmpty()
   @IsString()
-  @MaxLength(50, { message: 'PET' })
+  @MaxLength(50)
   @MinLength(3)
   username: string;
 
