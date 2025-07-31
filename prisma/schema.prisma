@@ -13,10 +13,10 @@ datasource db {
 model User{
   id String @id @default(uuid())
   roleId String 
-  firstName String @db.VarChar(30)
-  lastName String @db.VarChar(30)
   username String @db.VarChar(50) @unique
   email String @db.VarChar(320) @unique
+  firstName String @db.VarChar(30)
+  lastName String @db.VarChar(30)
   password String @db.VarChar(255)
   isActive Boolean @db.Boolean @default(false)
   activationToken String? @db.VarChar(255)
