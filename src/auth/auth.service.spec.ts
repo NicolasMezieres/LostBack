@@ -5,7 +5,15 @@ import { EmailService } from 'src/email/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthPrismaMock } from './mocks/Auth.prisma.mock';
-import { roleMock, signupMessageMock, userMock } from './mocks/auth.mock';
+import {
+  cookieRuleMock,
+  resMock,
+  roleMock,
+  signinResponseMock,
+  signupMessageMock,
+  tokenMock,
+  userMock,
+} from './mocks/auth.mock';
 import { AuthEmailMock } from './mocks/Auth.email.mock';
 import { AuthJwtMock } from './mocks/Auth.jwt.mock';
 import { AuthConfigMock } from './mocks/Auth.config.mock';
@@ -84,6 +92,48 @@ describe('AuthService', () => {
         .mockResolvedValue(undefined);
       expect(() => authService.signup(dto)).rejects.toEqual(
         new InternalServerErrorException('Error on the Database'),
+      );
+    });
+  });
+  describe('signin', () => {
+    const dto = {
+      identifier: 'maisouicclair@example.com',
+      password: 'StrongP@ssword73',
+    };
+    it("should return {message:'Connexion succesfully', role:'role'}", async () => {
+      const dataUser = { ...userMock, role: { name: 'role' } };
+      jest.spyOn(AuthPrismaMock.user, 'findFirst').mockResolvedValue(dataUser);
+      jest.spyOn(argon, 'verify').mockResolvedValue(true);
+      jest.spyOn(authService, 'signToken').mockResolvedValue(tokenMock);
+
+      expect(await authService.signin(dto, resMock)).toEqual(
+        signinResponseMock,
+      );
+      expect(resMock.cookie).toHaveBeenCalledWith(
+        'access_token',
+        tokenMock.connexion_token,
+        cookieRuleMock,
+      );
+    });
+    it('should return unauthorized exception Invalid credential', () => {
+      jest.spyOn(AuthPrismaMock.user, 'findFirst').mockResolvedValue(undefined);
+      expect(authService.signin(dto, resMock)).rejects.toEqual(
+        new UnauthorizedException('Invalid credential'),
+      );
+    });
+    it('should return unauthorized exception Your account is not active', () => {
+      const user = { ...userMock };
+      user.isActive = false;
+      jest.spyOn(AuthPrismaMock.user, 'findFirst').mockResolvedValue(user);
+      expect(authService.signin(dto, resMock)).rejects.toEqual(
+        new UnauthorizedException('Your account is not active'),
+      );
+    });
+    it('should return unauthorized exception Invalid credential', () => {
+      jest.spyOn(AuthPrismaMock.user, 'findFirst').mockResolvedValue(userMock);
+      jest.spyOn(argon, 'verify').mockResolvedValue(false);
+      expect(authService.signin(dto, resMock)).rejects.toEqual(
+        new UnauthorizedException('Invalid credential'),
       );
     });
   });

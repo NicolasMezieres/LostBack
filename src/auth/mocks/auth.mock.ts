@@ -7,7 +7,7 @@ export const signinResponseMock = {
   message: 'Connexion succesfully',
   role: 'role',
 };
-
+export const tokenMock = { connexion_token: 'jwtToken' };
 export const resMock = { cookie: jest.fn() } as unknown as Response;
 
 export const userMock = {
@@ -41,4 +41,14 @@ export const adminMock = {
 export const roleMock = {
   id: 1,
   role: 'role',
+};
+export const cookieRuleMock = {
+  // permet au cookie d'être accessible uniquement au serveur web
+  httpOnly: true,
+  //strict si c'est le front et le back on le même url sinon none
+  sameSite: 'none',
+  //durée du cookie
+  maxAge: 1000 * 60 * 60 * 24 * 7,
+  //est ce que le cookie doit provenir d'un https et est ce que c'est le même nom de domaine entre back et front
+  secure: process.env.IS_PRODUCTION === 'true' ? true : false,
 };
