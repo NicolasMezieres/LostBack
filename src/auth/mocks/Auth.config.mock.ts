@@ -1,1 +1,3 @@
-export const AuthConfigMock = {};
+export const AuthConfigMock = {
+  get: jest.fn(),
+};

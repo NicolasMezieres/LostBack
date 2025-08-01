@@ -19,6 +19,7 @@ import { AuthJwtMock } from './mocks/Auth.jwt.mock';
 import { AuthConfigMock } from './mocks/Auth.config.mock';
 import {
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import * as argon from 'argon2';
@@ -135,6 +136,58 @@ describe('AuthService', () => {
       expect(authService.signin(dto, resMock)).rejects.toEqual(
         new UnauthorizedException('Invalid credential'),
       );
+    });
+  });
+  describe('activationAccount', () => {
+    const token = 'token';
+    it('should return Your account is active ! ', () => {
+      const user = { ...userMock };
+      user.activationToken = token;
+      jest.spyOn(AuthPrismaMock.user, 'findFirst').mockResolvedValue(userMock);
+      jest.spyOn(AuthPrismaMock.user, 'update').mockResolvedValue(userMock);
+      expect(authService.activationAccount(token)).resolves.toEqual({
+        message: 'Your account is active !',
+      });
+    });
+    it('should return Not found exception Account not found', () => {
+      jest.spyOn(AuthPrismaMock.user, 'findFirst').mockResolvedValue(undefined);
+      expect(authService.activationAccount(token)).rejects.toEqual(
+        new NotFoundException('Account not found'),
+      );
+    });
+  });
+  describe('signToken', () => {
+    it('should return connexion token', () => {
+      jest.spyOn(AuthJwtMock, 'signAsync').mockResolvedValue('jwtToken');
+      jest.spyOn(AuthConfigMock, 'get').mockResolvedValue('jwt secret');
+      expect(authService.signToken(userMock, '1d')).resolves.toEqual({
+        connexion_token: 'jwtToken',
+      });
+    });
+  });
+  describe('forgetPassword', () => {
+    const dto = { email: 'email@email.com' };
+    it('should return Check your email', () => {
+      jest.spyOn(AuthPrismaMock.user, 'findUnique').mockResolvedValue(userMock);
+      expect(authService.forgetPassword(dto)).resolves.toEqual({
+        message: 'Check your email',
+      });
+    });
+    it('should return Your account is not active', () => {
+      const user = { ...userMock };
+      user.isActive = false;
+      jest.spyOn(AuthPrismaMock.user, 'findUnique').mockResolvedValue(user);
+      expect(authService.forgetPassword(dto)).resolves.toEqual({
+        message: 'Your account is not active',
+      });
+    });
+  });
+  describe('resetPassword', () => {
+    it('should return Password change, congratuilations !', () => {
+      jest.spyOn(argon, 'hash').mockResolvedValue('hashed new password');
+      expect(
+        authService.resetPassword(userMock, { password: 'new password' }),
+      ).resolves.toEqual({ message: 'Password change, congratulations !' });
     });
   });
 });
